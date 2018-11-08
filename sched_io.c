@@ -8,39 +8,97 @@
 #include <string.h>
 #include <sys/time.h>
 
+typedef struct node{
+	int data;  // io _time
+    	int pid_index;
+	struct node *ptr;
+} node;
+
+node* insert(node* head, int num, int pid_index) {
+    node *temp, *prev, *next;
+    temp = (node*)malloc(sizeof(node));
+    temp->data = num;
+    temp->pid_index = pid_index;
+    temp->ptr = NULL;
+    if(!head){
+        head=temp;
+    } else{
+        prev = NULL;
+        next = head;
+        while(next && next->data <= num){
+            prev = next;
+            next = next->ptr;
+        }
+        if(!next){
+            prev->ptr = temp;
+        } else{
+            if(prev) {
+                temp->ptr = prev->ptr;
+                prev-> ptr = temp;
+            } else {
+                temp->ptr = head;
+                head = temp;
+            }            
+        }   
+    }
+    return head;
+}
+
+
+node* delete(node* head)
+{
+        node* temp;
+        temp = head;
+        head = temp->ptr;
+	free(temp);
+
+	return head;
+}
+
+void free_list(node *head) {
+    node *prev = head;
+    node *cur = head;
+    while(cur) {
+        prev = cur;
+        cur = prev->ptr;
+        free(prev);
+    }
+}
+
+
 
 int count = 0;
 int i = 0;
 int total_count = 0;
 pid_t pid[3];
-int child_execution_time[3] ={3,3,3};
+int child_execution_time[3] ={6,3,3};
 int child_execution_ctime[3];
-int child_io_time[3]={1,1,2};
-int child_io_ctime[3]={1,1,2};
+node* head ;
+int child_io_time[3]={7,2,1};
+int child_io_ctime[3]={1,2,3};
 int front, rear = 0;
-int w_front, w_rear = 0;
+//int w_front, w_rear = 0;
 int run_queue[10];
-int wait_queue[10];
+//int wait_queue[10];
 int curr_execution_time ;
 
-void wait_queue_check()
+node* wait_queue_check(node* head)
 {
-	int walk = w_front;
-	if( (w_front%10) != (w_rear%10)){ //when the wait queue is not empty
-		while((walk%10)!=(w_rear)%10){
-			printf("process %d in I/O\n ",wait_queue[walk%10]);
-
-			child_io_time[wait_queue[walk%10]]--;
-			if(child_io_time[wait_queue[walk%10]] == 0){
-				run_queue[(rear++)%10] = wait_queue[walk%10];
-				child_io_time[wait_queue[walk%10]] = child_io_ctime[wait_queue[walk%10]];
-				w_front ++;
-			}
-			walk++;
-
+	node* p;
+	p= head;
+		
+	while(p)
+	{
+		printf("process %d in IO\n",p->pid_index);
+		p->data--;
+		if(p->data == 0){
+			//printf("process %d finish in IO\n",p->pid_index);
+			run_queue[(rear++)%10] = p->pid_index;
+			head = delete(head);
 		}
-	}
-			
+		p = p->ptr;
+	}		
+	return head;
 }
 
 void signal_user_handler(int signum)  // sig child handler 
@@ -49,7 +107,7 @@ void signal_user_handler(int signum)  // sig child handler
 	child_execution_time[i]-- ; 
 	if(child_execution_time[i] == 0)
 	{
-		printf("child process end and will go to io\n");
+	//	printf("child process end and will go to io\n");
 		child_execution_time[i] = curr_execution_time;
 //		exit(0);
 	}
@@ -60,14 +118,14 @@ void signal_callback_handler(int signum)  // sig parent handler
         //printf("Caught signal_parent %d\n",signum);
 	total_count ++;
 	count ++;
-        if(total_count >= 20 ){
+        if(total_count >= 50 ){
 		for(int k = 0; k < 3 ; k ++)
 		{
 			kill(pid[k],SIGKILL);
 		}
                 exit(0);
 	}
-	wait_queue_check();
+	head=wait_queue_check(head);
 	if((front%10) != (rear%10)){
 		kill(pid[run_queue[front% 10]],SIGINT);
 		child_execution_time[run_queue[front%10]] --;
@@ -80,7 +138,7 @@ void signal_callback_handler(int signum)  // sig parent handler
 	        if(child_execution_time[run_queue[front%10]] != 0)
         	        run_queue[(rear++)%10] = run_queue[front%10];
 		if(child_execution_time[run_queue[front%10]] == 0 ){
-			wait_queue[(w_rear++)%10] = run_queue[front%10];	
+			head= insert(head ,child_io_time[run_queue[front%10]], run_queue[front%10]);
 			child_execution_time[run_queue[front%10]] = child_execution_ctime[run_queue[front%10]];
 		}
 		front ++; 
@@ -93,7 +151,7 @@ int main(int argc, char *argv[])
 	//pid_t pid;
 	for(int l=0; l<3;l++)
 		child_execution_ctime[l]=child_execution_time[l]; //copty the time
-	curr_execution_time = child_execution_time[i];
+//	curr_execution_time = child_execution_time[i];
         while(i< 3) {
         pid[i] = fork();
         run_queue[(rear++)%10] = i ;
@@ -103,6 +161,7 @@ int main(int argc, char *argv[])
         }
         else if (pid[i]== 0) {
                 //child
+		curr_execution_time = child_execution_time[i];
                 struct sigaction old_sa;
                 struct sigaction new_sa;
 		memset(&new_sa, 0, sizeof(new_sa));
