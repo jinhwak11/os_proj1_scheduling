@@ -75,7 +75,7 @@ int child_execution_time[3] ={6,3,3};
 int child_execution_ctime[3];
 node* head ;
 int child_io_time[3]={7,2,1};
-int child_io_ctime[3]={1,2,3};
+//int child_io_ctime[3]={1,2,3};
 int front, rear = 0;
 //int w_front, w_rear = 0;
 int run_queue[10];
@@ -118,7 +118,7 @@ void signal_callback_handler(int signum)  // sig parent handler
         //printf("Caught signal_parent %d\n",signum);
 	total_count ++;
 	count ++;
-        if(total_count >= 50 ){
+        if(total_count >= 60 ){
 		for(int k = 0; k < 3 ; k ++)
 		{
 			kill(pid[k],SIGKILL);
