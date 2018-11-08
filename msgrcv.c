@@ -14,7 +14,7 @@ int main()
 
 	struct msgbuf msg;
 	memset(&msg, 0, sizeof(msg));
-	ret= msgrcv(msgq, &msg, sizeof(msg), NULL);
+	ret= msgrcv(msgq, &msg, sizeof(msg), 0,NULL);
 	printf("msgsnd ret: %d\n", ret);
 	printf("msg.mtype: %d\n", msg.mtype);
 	printf("msg.pid: %d\n", msg.pid);
