@@ -13,13 +13,15 @@ int count = 0;
 int i = 0;
 int total_count = 0;
 pid_t pid[3];
-int child_execution_time[3] ={6,6,6}; 
-int child_io_time[3]={7,3,3};
-int child_io_ctime[3]={7,3,3};
+int child_execution_time[3] ={3,3,3};
+int child_execution_ctime[3];
+int child_io_time[3]={1,1,2};
+int child_io_ctime[3]={1,1,2};
 int front, rear = 0;
 int w_front, w_rear = 0;
 int run_queue[10];
 int wait_queue[10];
+int curr_execution_time ;
 
 void wait_queue_check()
 {
@@ -28,11 +30,11 @@ void wait_queue_check()
 		while((walk%10)!=(w_rear)%10){
 			printf("process %d in I/O\n ",wait_queue[walk%10]);
 
-			child_io_time[wait_queue[walk%10]] -- ;
+			child_io_time[wait_queue[walk%10]]--;
 			if(child_io_time[wait_queue[walk%10]] == 0){
-				w_front ++;
 				run_queue[(rear++)%10] = wait_queue[walk%10];
 				child_io_time[wait_queue[walk%10]] = child_io_ctime[wait_queue[walk%10]];
+				w_front ++;
 			}
 			walk++;
 
@@ -43,14 +45,12 @@ void wait_queue_check()
 
 void signal_user_handler(int signum)  // sig child handler 
 {
-	int curr_execution_time ;
-	curr_execution_time = child_execution_time[i];
         printf("caught signal %d %d\n",signum,getpid());
-	curr_execution_time-- ; 
-	if(curr_execution_time <= 0)
+	child_execution_time[i]-- ; 
+	if(child_execution_time[i] == 0)
 	{
 		printf("child process end and will go to io\n");
-		curr_execution_time = child_execution_time[i];
+		child_execution_time[i] = curr_execution_time;
 //		exit(0);
 	}
 }
@@ -60,26 +60,29 @@ void signal_callback_handler(int signum)  // sig parent handler
         //printf("Caught signal_parent %d\n",signum);
 	total_count ++;
 	count ++;
-        if(total_count >= 30 ){
+        if(total_count >= 20 ){
 		for(int k = 0; k < 3 ; k ++)
 		{
 			kill(pid[k],SIGKILL);
 		}
                 exit(0);
 	}
-	if((front%10) != (rear%10)){
-	kill(pid[run_queue[front% 10]],SIGINT);
-	child_execution_time[run_queue[front%10]] --;
-	}
 	wait_queue_check();
+	if((front%10) != (rear%10)){
+		kill(pid[run_queue[front% 10]],SIGINT);
+		child_execution_time[run_queue[front%10]] --;
+	}
+//	wait_queue_check();
 	if((count == 3)|(child_execution_time[run_queue[front%10]]==0)){
 		//printf("front : %d , rear %d\n",front,rear);
 		//printf("child_time : %d ",child_time[run_queue[front&10]]);
 		count  = 0;
 	        if(child_execution_time[run_queue[front%10]] != 0)
         	        run_queue[(rear++)%10] = run_queue[front%10];
-		if(child_execution_time[run_queue[front%10]] == 0 )
-			wait_queue[(w_rear++)%10] = run_queue[front%10];
+		if(child_execution_time[run_queue[front%10]] == 0 ){
+			wait_queue[(w_rear++)%10] = run_queue[front%10];	
+			child_execution_time[run_queue[front%10]] = child_execution_ctime[run_queue[front%10]];
+		}
 		front ++; 
 	}
 }
@@ -88,7 +91,9 @@ void signal_callback_handler(int signum)  // sig parent handler
 int main(int argc, char *argv[])
 {
 	//pid_t pid;
-	
+	for(int l=0; l<3;l++)
+		child_execution_ctime[l]=child_execution_time[l]; //copty the time
+	curr_execution_time = child_execution_time[i];
         while(i< 3) {
         pid[i] = fork();
         run_queue[(rear++)%10] = i ;
