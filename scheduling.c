@@ -20,22 +20,23 @@ int run_queue[10];
 void signal_user_handler(int signum)  // sig child handler 
 {
 	
-        printf("caught signal %d %d\n",signum,getpid());
+        printf("pid: %d remaining cpu-burst%d\n",getpid(),child_execution_time[i]);
 	child_execution_time[i] -- ; 
 	if(child_execution_time[i] <= 0)
 	{
-		printf("child end\n");
+		//printf("child end\n");
 		exit(0);
 	}
 }
 
 void signal_callback_handler(int signum)  // sig parent handler
 {
-        //printf("Caught signal_parent %d\n",signum);
 	total_count ++;
 	count ++;
         if(total_count >= 23 )
                 exit(0);
+	
+	printf("time %d:\n",total_count);
 	kill(pid[run_queue[front% 10]],SIGINT);
 	child_execution_time[run_queue[front%10]] --;
 	if((count == 3)|(child_execution_time[run_queue[front%10]]==0)){
