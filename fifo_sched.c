@@ -10,12 +10,6 @@
 #include <sys/ipc.h>
 #include <sys/msg.h>
 
-struct msgbuf
-{
-    int mtype;
-    int pid;
-    int exec_time[3];
-};
 
 int count = 0;
 int i = 0;
@@ -80,55 +74,18 @@ int main(int argc, char *argv[])
         }
         else if (pid[i]== 0) 
 		{//child
-
-			while(1)    //to send msgq
-        	{
-            	int key;
-            	int msgq;
-            	int ret;
-
-	            key = 0x12345;
-    	        msgq = msgget(key, 0666| IPC_CREAT); //msgget create a message queue and return the identifier
-        	    printf("sender msgq: %d\n", msgq); //print out identifier
-            	struct msgbuf msg;
-	            memset(&msg, 0, sizeof(msg));
-    	        msg.mtype =0;
-        	    msg.pid = getpid();
-	            msg.exec_time[i] = child_execution_time[i];
-    	        printf("Sending child %d execution time: %d\n",msg.pid, msg.exec_time[i]);
-        	    ret = msgsnd(msgq, &msg, sizeof(msg), NULL); //send the message
-            	if(ret == -1)
-                	perror("msgsnd error");
-                
-				return 0;
-        	}
 			struct sigaction old_sa;
             struct sigaction new_sa;
 			memset(&new_sa, 0, sizeof(new_sa));
 			new_sa.sa_handler = &signal_child_handler;
 			sigaction(SIGINT, &new_sa, &old_sa);
 		
+
+			while(1);
 			return 0;
         }
         else 
 		{//parent
-			while(waitpid(pid[i], NULL,0) != -1)
-            {
-                int key;
-                int msgq;
-                int ret;
-                key = 0x12345;
-                msgq = msgget(key, 0666| IPC_CREAT); //create queue
-                printf("receiver msgq: %d\n", msgq); //print out identifier
-
-                struct msgbuf msg;
-                memset(&msg, 0, sizeof(msg));
-                ret = msgrcv(msgq,&msg,sizeof(msgq),0,NULL); //to receive message
-                printf("Received msg!\nmsg.exec_time[i]: %d\n", msg.exec_time[i]);
-
-                msgctl(msgq, IPC_RMID, NULL);
-                break;
-            }
 			struct sigaction old_sa;
 			struct sigaction new_sa;
 			memset(&new_sa, 0, sizeof(new_sa));	
@@ -146,6 +103,8 @@ int main(int argc, char *argv[])
  		}
 		i++;
 	}
+	while(1);
+	return 0;
 
 }
 
