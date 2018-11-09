@@ -7,17 +7,25 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/time.h>
-
+ #include <sys/ipc.h>
+ #include <sys/msg.h>
 typedef struct node{
 	int data;  // io _time
     	int pid_index;
 	struct node *ptr;
 } node;
 
+struct msgbuf{
+	long int  mtype;
+	int pid_index;
+	int io_time;
+};
+
+int child_io_time[3]={0};
 node* insert(node* head, int num, int pid_index) {
     node *temp, *prev, *next;
     temp = (node*)malloc(sizeof(node));
-    temp->data = num;
+    temp->data = child_io_time[pid_index];
     temp->pid_index = pid_index;
     temp->ptr = NULL;
     if(!head){
@@ -71,16 +79,23 @@ int count = 0;
 int i = 0;
 int total_count = 0;
 pid_t pid[3];
-int child_execution_time[3] ={6,3,3};
+int child_execution_time[3] ={6,6,6};
 int child_execution_ctime[3];
 node* head ;
-int child_io_time[3]={7,2,1};
 //int child_io_ctime[3]={1,2,3};
 int front, rear = 0;
 //int w_front, w_rear = 0;
 int run_queue[10];
 //int wait_queue[10];
 int curr_execution_time ;
+int io_time;
+
+
+int msgq;
+int ret;
+int key = 0x12345;
+int flag=0;
+struct msgbuf msg;
 
 node* wait_queue_check(node* head)
 {
@@ -91,7 +106,7 @@ node* wait_queue_check(node* head)
 	{
 		printf("process %d in IO\n",p->pid_index);
 		p->data--;
-		if(p->data == 0){
+		if(p->data <= 0){
 			//printf("process %d finish in IO\n",p->pid_index);
 			run_queue[(rear++)%10] = p->pid_index;
 			head = delete(head);
@@ -105,17 +120,30 @@ void signal_user_handler(int signum)  // sig child handler
 {
         printf("caught signal %d %d\n",signum,getpid());
 	child_execution_time[i]-- ; 
-	if(child_execution_time[i] == 0)
+	if(child_execution_time[i] <= 0)
 	{
 	//	printf("child process end and will go to io\n");
 		child_execution_time[i] = curr_execution_time; // recover execution time
 		//여기다가 메세지에다가 io time 보내주는 거 넣어야함
+		memset(&msg,0,sizeof(msg));
+		msg.mtype = IPC_NOWAIT;
+		msg.pid_index = i;
+		msg.io_time = io_time;
+		ret = msgsnd(msgq, &msg, sizeof(msg),IPC_NOWAIT);
+		if(ret == -1)
+			perror("msgsnd error");
+		//else
+		//	printf("send message");
 	}
 }
 
 void signal_callback_handler(int signum)  // sig parent handler
 {
         //printf("Caught signal_parent %d\n",signum);
+	if(flag == 1){
+		head= insert(head ,child_io_time[run_queue[(front-1)%10]], run_queue[(front-1)%10]);
+		flag = 0;
+	}
 	total_count ++;
 	count ++;
         if(total_count >= 60 ){
@@ -138,8 +166,15 @@ void signal_callback_handler(int signum)  // sig parent handler
 	        if(child_execution_time[run_queue[front%10]] != 0)
         	        run_queue[(rear++)%10] = run_queue[front%10];
 		if(child_execution_time[run_queue[front%10]] == 0 ){
-			head= insert(head ,child_io_time[run_queue[front%10]], run_queue[front%10]); // insert to wait queue
-			child_execution_time[run_queue[front%10]] = child_execution_ctime[run_queue[front%10]]; //child execution time recover
+			child_execution_time[run_queue[front%10]] = child_execution_ctime[run_queue[front%10]]; //child execution time recover	
+		/*	while(1){
+				if(child_io_time[run_queue[front%10]] !=0)
+					break;
+		V	}*/
+	
+		//	printf("child_io_time %d\n",child_io_time[run_queue[front%10]]);
+			flag= 1; 
+			//head= insert(head ,child_io_time[run_queue[front%10]], run_queue[front%10]); // insert to wait queue
 		}
 		front ++; 
 	}
@@ -149,6 +184,8 @@ void signal_callback_handler(int signum)  // sig parent handler
 int main(int argc, char *argv[])
 {
 	//pid_t pid;
+	
+	msgq = msgget( key, IPC_CREAT | 0666);
 	for(int l=0; l<3;l++)
 		child_execution_ctime[l]=child_execution_time[l]; //copty the time
 //	curr_execution_time = child_execution_time[i];
@@ -161,7 +198,9 @@ int main(int argc, char *argv[])
         }
         else if (pid[i]== 0) {
                 //child
-		//io time 정해야함
+		//io time
+		io_time = 5;
+		//printf("msgq id: %d\n", msgq);
 		curr_execution_time = child_execution_time[i];
                 struct sigaction old_sa;
                 struct sigaction new_sa;
@@ -175,6 +214,10 @@ int main(int argc, char *argv[])
                 //parent
                 //printf("my pid is %d\n", getpid());
 		// iterative signal , timer --> alarm
+		
+		//printf("msgq %d\n ",msgq);
+		memset(&msg, 0, sizeof(msg));
+
 		struct sigaction old_sa;
 		struct sigaction new_sa;
 		memset(&new_sa, 0, sizeof(new_sa));	
@@ -191,7 +234,18 @@ int main(int argc, char *argv[])
  	}
 	i++;
         }
-	while(1);
+	while(1){
+	//memset(&msg, 0, sizeof(msg));
+		ret = msgrcv(msgq,&msg,sizeof(msg),IPC_NOWAIT,IPC_NOWAIT); //to receive message
+		if(ret != -1){
+			printf("get message\n");
+			//printf("insert io _time %d to child_io_time",msg.io_time);
+			child_io_time[msg.pid_index]=msg.io_time;
+			memset(&msg, 0, sizeof(msg));
+
+		}
+		
+	}
         return 0;
 
 }
