@@ -7,8 +7,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/time.h>
- #include <sys/ipc.h>
- #include <sys/msg.h>
+#include <sys/ipc.h>
+#include <sys/msg.h>
+
 typedef struct node{
 	int data;  // io _time
     	int pid_index;
@@ -22,6 +23,7 @@ struct msgbuf{
 };
 
 int child_io_time[3]={0};
+
 node* insert(node* head, int num, int pid_index) {
     node *temp, *prev, *next;
     temp = (node*)malloc(sizeof(node));
@@ -73,8 +75,6 @@ void free_list(node *head) {
     }
 }
 
-
-
 int count = 0;
 int i = 0;
 int total_count = 0;
@@ -118,18 +118,24 @@ node* wait_queue_check(node* head)
 
 void signal_user_handler(int signum)  // sig child handler 
 {
-        printf("caught signal %d %d\n",signum,getpid());
+
+    printf("---------------------------------\n|	Child: %d		|\n",getpid());
+	printf("|	Execution time: %d	|\n", child_execution_time[i]);
 	child_execution_time[i]-- ; 
 	if(child_execution_time[i] <= 0)
 	{
-	//	printf("child process end and will go to io\n");
+		printf("*********************************\n	Entering IO Process\n*********************************\n");
 		child_execution_time[i] = curr_execution_time; // recover execution time
 		//여기다가 메세지에다가 io time 보내주는 거 넣어야함
+		
+		
 		memset(&msg,0,sizeof(msg));
 		msg.mtype = IPC_NOWAIT;
 		msg.pid_index = i;
 		msg.io_time = io_time;
 		ret = msgsnd(msgq, &msg, sizeof(msg),IPC_NOWAIT);
+		printf("Child sending io time: %d\n", msg.io_time);
+
 		if(ret == -1)
 			perror("msgsnd error");
 		//else
@@ -238,7 +244,7 @@ int main(int argc, char *argv[])
 	//memset(&msg, 0, sizeof(msg));
 		ret = msgrcv(msgq,&msg,sizeof(msg),IPC_NOWAIT,IPC_NOWAIT); //to receive message
 		if(ret != -1){
-			printf("get message\n");
+			printf("Parent received io time: %d\n", msg.io_time);
 			//printf("insert io _time %d to child_io_time",msg.io_time);
 			child_io_time[msg.pid_index]=msg.io_time;
 			memset(&msg, 0, sizeof(msg));
