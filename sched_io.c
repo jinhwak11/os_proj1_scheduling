@@ -108,8 +108,8 @@ void signal_user_handler(int signum)  // sig child handler
 	if(child_execution_time[i] == 0)
 	{
 	//	printf("child process end and will go to io\n");
-		child_execution_time[i] = curr_execution_time;
-//		exit(0);
+		child_execution_time[i] = curr_execution_time; // recover execution time
+		//여기다가 메세지에다가 io time 보내주는 거 넣어야함
 	}
 }
 
@@ -138,8 +138,8 @@ void signal_callback_handler(int signum)  // sig parent handler
 	        if(child_execution_time[run_queue[front%10]] != 0)
         	        run_queue[(rear++)%10] = run_queue[front%10];
 		if(child_execution_time[run_queue[front%10]] == 0 ){
-			head= insert(head ,child_io_time[run_queue[front%10]], run_queue[front%10]);
-			child_execution_time[run_queue[front%10]] = child_execution_ctime[run_queue[front%10]];
+			head= insert(head ,child_io_time[run_queue[front%10]], run_queue[front%10]); // insert to wait queue
+			child_execution_time[run_queue[front%10]] = child_execution_ctime[run_queue[front%10]]; //child execution time recover
 		}
 		front ++; 
 	}
@@ -161,6 +161,7 @@ int main(int argc, char *argv[])
         }
         else if (pid[i]== 0) {
                 //child
+		//io time 정해야함
 		curr_execution_time = child_execution_time[i];
                 struct sigaction old_sa;
                 struct sigaction new_sa;
