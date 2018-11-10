@@ -151,7 +151,7 @@ void signal_callback_handler(int signum)  // sig parent handler
 	}
 	total_count ++;
 	count ++;
-	fprintf(fptr,"time %d:\n",total_count);
+	fprintf(fptr,"time %d:===============================================\n",total_count);
         if(total_count >= 60 ){
 		for(int k = 0; k < CHILDNUM ; k ++)
 		{
