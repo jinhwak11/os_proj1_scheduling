@@ -104,7 +104,7 @@ node* wait_queue_check(node* head)
 		
 	while(p)
 	{
-		printf("process %d in IO\n",p->pid_index);
+		printf("pid: %d in IO, remaining IO-burst: %d\n",pid[p->pid_index],p->data);
 		p->data--;
 		if(p->data <= 0){
 			//printf("process %d finish in IO\n",p->pid_index);
@@ -118,7 +118,7 @@ node* wait_queue_check(node* head)
 
 void signal_user_handler(int signum)  // sig child handler 
 {
-        printf("caught signal %d %d\n",signum,getpid());
+        printf("pid:%d remaining cpu-burst%d\n",getpid(),child_execution_time[i]);
 	child_execution_time[i]-- ; 
 	if(child_execution_time[i] <= 0)
 	{
@@ -146,6 +146,7 @@ void signal_callback_handler(int signum)  // sig parent handler
 	}
 	total_count ++;
 	count ++;
+	printf("time %d:\n",total_count);
         if(total_count >= 60 ){
 		for(int k = 0; k < 3 ; k ++)
 		{
