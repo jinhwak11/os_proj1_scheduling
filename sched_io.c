@@ -9,6 +9,8 @@
 #include <sys/time.h>
  #include <sys/ipc.h>
  #include <sys/msg.h>
+#define CHILDNUM 10
+
 typedef struct node{
 	int data;  // io _time
     	int pid_index;
@@ -21,7 +23,31 @@ struct msgbuf{
 	int io_time;
 };
 
-int child_io_time[3]={0};
+int child_io_time[CHILDNUM]={0};
+int count = 0;
+int i = 0;
+int total_count = 0;
+pid_t pid[CHILDNUM];
+
+int child_execution_time[CHILDNUM] ={2,6,5,4,1,3,2,3,5,6};
+int child_execution_ctime[CHILDNUM];
+node* head ;
+//int child_io_ctime[3]={1,2,3};
+int front, rear = 0;
+//int w_front, w_rear = 0;
+int run_queue[20];
+//int wait_queue[10];
+int curr_execution_time ;
+int io_time;
+
+
+int msgq;
+int ret;
+int key = 0x12345;
+int flag=0;
+struct msgbuf msg;
+
+
 node* insert(node* head, int num, int pid_index) {
     node *temp, *prev, *next;
     temp = (node*)malloc(sizeof(node));
@@ -75,28 +101,6 @@ void free_list(node *head) {
 
 
 
-int count = 0;
-int i = 0;
-int total_count = 0;
-pid_t pid[3];
-int child_execution_time[3] ={6,6,6};
-int child_execution_ctime[3];
-node* head ;
-//int child_io_ctime[3]={1,2,3};
-int front, rear = 0;
-//int w_front, w_rear = 0;
-int run_queue[10];
-//int wait_queue[10];
-int curr_execution_time ;
-int io_time;
-
-
-int msgq;
-int ret;
-int key = 0x12345;
-int flag=0;
-struct msgbuf msg;
-
 node* wait_queue_check(node* head)
 {
 	node* p;
@@ -108,7 +112,7 @@ node* wait_queue_check(node* head)
 		p->data--;
 		if(p->data <= 0){
 			//printf("process %d finish in IO\n",p->pid_index);
-			run_queue[(rear++)%10] = p->pid_index;
+			run_queue[(rear++)%20] = p->pid_index;
 			head = delete(head);
 		}
 		p = p->ptr;
@@ -141,43 +145,36 @@ void signal_callback_handler(int signum)  // sig parent handler
 {
         //printf("Caught signal_parent %d\n",signum);
 	if(flag == 1){
-		head= insert(head ,child_io_time[run_queue[(front-1)%10]], run_queue[(front-1)%10]);
+		head= insert(head ,child_io_time[run_queue[(front-1)%20]], run_queue[(front-1)%20]);
 		flag = 0;
 	}
 	total_count ++;
 	count ++;
 	printf("time %d:\n",total_count);
         if(total_count >= 60 ){
-		for(int k = 0; k < 3 ; k ++)
+		for(int k = 0; k < CHILDNUM ; k ++)
 		{
 			kill(pid[k],SIGKILL);
 		}
                 exit(0);
 	}
 	head=wait_queue_check(head);
-	if((front%10) != (rear%10)){
-		kill(pid[run_queue[front% 10]],SIGINT);
-		child_execution_time[run_queue[front%10]] --;
+	if((front%20) != (rear%20)){
+		kill(pid[run_queue[front% 20]],SIGINT);
+		child_execution_time[run_queue[front%20]] --;
 	}
 //	wait_queue_check();
-	if((count == 3)|(child_execution_time[run_queue[front%10]]==0)){
+	if((count == 3)|(child_execution_time[run_queue[front%20]]==0)){
 		//printf("front : %d , rear %d\n",front,rear);
 		//printf("child_time : %d ",child_time[run_queue[front&10]]);
 		count  = 0;
-	        if(child_execution_time[run_queue[front%10]] != 0)
-        	        run_queue[(rear++)%10] = run_queue[front%10];
-		if(child_execution_time[run_queue[front%10]] == 0 ){
-			child_execution_time[run_queue[front%10]] = child_execution_ctime[run_queue[front%10]]; //child execution time recover	
-		/*	while(1){
-				if(child_io_time[run_queue[front%10]] !=0)
-					break;
-		V	}*/
-	
-		//	printf("child_io_time %d\n",child_io_time[run_queue[front%10]]);
-			flag= 1; 
-			//head= insert(head ,child_io_time[run_queue[front%10]], run_queue[front%10]); // insert to wait queue
-		}
-		front ++; 
+	        if(child_execution_time[run_queue[front%20]] != 0)
+        	        run_queue[(rear++)%20] = run_queue[front%20];
+		if(child_execution_time[run_queue[front%20]] == 0 ){
+			child_execution_time[run_queue[front%20]] = child_execution_ctime[run_queue[front%20]]; //child execution time recover	
+		flag= 1; 
+	}
+	front ++; 
 	}
 }
 
@@ -187,12 +184,12 @@ int main(int argc, char *argv[])
 	//pid_t pid;
 	
 	msgq = msgget( key, IPC_CREAT | 0666);
-	for(int l=0; l<3;l++)
+	for(int l=0; l<CHILDNUM;l++)
 		child_execution_ctime[l]=child_execution_time[l]; //copty the time
 //	curr_execution_time = child_execution_time[i];
-        while(i< 3) {
+        while(i< CHILDNUM) {
         pid[i] = fork();
-        run_queue[(rear++)%10] = i ;
+        run_queue[(rear++)%20] = i ;
         if (pid[i]== -1) {
                 perror("fork error");
                 return 0;
