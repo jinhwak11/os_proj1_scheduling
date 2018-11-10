@@ -7,8 +7,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/time.h>
- #include <sys/ipc.h>
- #include <sys/msg.h>
+#include <sys/ipc.h>
+#include <sys/msg.h>
+#include <time.h>
+
 #define CHILDNUM 10
 
 typedef struct node{
@@ -129,6 +131,7 @@ void signal_user_handler(int signum)  // sig child handler
 	//	printf("child process end and will go to io\n");
 		child_execution_time[i] = curr_execution_time; // recover execution time
 		//여기다가 메세지에다가 io time 보내주는 거 넣어야함
+		io_time= rand()%10 +1;
 		memset(&msg,0,sizeof(msg));
 		msg.mtype = IPC_NOWAIT;
 		msg.pid_index = i;
@@ -136,8 +139,6 @@ void signal_user_handler(int signum)  // sig child handler
 		ret = msgsnd(msgq, &msg, sizeof(msg),IPC_NOWAIT);
 		if(ret == -1)
 			perror("msgsnd error");
-		//else
-		//	printf("send message");
 	}
 }
 
@@ -188,6 +189,7 @@ int main(int argc, char *argv[])
 		child_execution_ctime[l]=child_execution_time[l]; //copty the time
 //	curr_execution_time = child_execution_time[i];
         while(i< CHILDNUM) {
+	srand(time(NULL) - i*2);	
         pid[i] = fork();
         run_queue[(rear++)%20] = i ;
         if (pid[i]== -1) {
@@ -197,7 +199,7 @@ int main(int argc, char *argv[])
         else if (pid[i]== 0) {
                 //child
 		//io time
-		io_time = 5;
+		io_time = rand()%10 + 1; // 1~10 randome variable
 		//printf("msgq id: %d\n", msgq);
 		curr_execution_time = child_execution_time[i];
                 struct sigaction old_sa;
