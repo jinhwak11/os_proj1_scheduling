@@ -25,6 +25,7 @@ struct msgbuf{
 	int io_time;
 };
 
+FILE* fptr;
 int child_io_time[CHILDNUM]={0};
 int count = 0;
 int i = 0;
@@ -110,7 +111,7 @@ node* wait_queue_check(node* head)
 		
 	while(p)
 	{
-		printf("pid: %d in IO, remaining IO-burst: %d\n",pid[p->pid_index],p->data);
+		fprintf(fptr,"pid: %d in IO, remaining IO-burst: %d\n",pid[p->pid_index],p->data);
 		p->data--;
 		if(p->data <= 0){
 			//printf("process %d finish in IO\n",p->pid_index);
@@ -124,7 +125,6 @@ node* wait_queue_check(node* head)
 
 void signal_user_handler(int signum)  // sig child handler 
 {
-        printf("pid:%d remaining cpu-burst%d\n",getpid(),child_execution_time[i]);
 	child_execution_time[i]-- ; 
 	if(child_execution_time[i] <= 0)
 	{
@@ -151,15 +151,19 @@ void signal_callback_handler(int signum)  // sig parent handler
 	}
 	total_count ++;
 	count ++;
-	printf("time %d:\n",total_count);
+	fprintf(fptr,"time %d:===============================================\n",total_count);
         if(total_count >= 60 ){
 		for(int k = 0; k < CHILDNUM ; k ++)
 		{
 			kill(pid[k],SIGKILL);
 		}
+		 msgctl(msgq, IPC_RMID, NULL);
+		fclose(fptr);
                 exit(0);
 	}
 	head=wait_queue_check(head);
+
+	fprintf(fptr,"pid:%d ,remaining cpu-burst%d\n",pid[run_queue[front% 20]],child_execution_time[run_queue[front% 20]]);
 	if((front%20) != (rear%20)){
 		kill(pid[run_queue[front% 20]],SIGINT);
 		child_execution_time[run_queue[front%20]] --;
@@ -183,7 +187,7 @@ void signal_callback_handler(int signum)  // sig parent handler
 int main(int argc, char *argv[])
 {
 	//pid_t pid;
-	
+	fptr = fopen("schedule_dump.txt","w");	
 	msgq = msgget( key, IPC_CREAT | 0666);
 	for(int l=0; l<CHILDNUM;l++)
 		child_execution_ctime[l]=child_execution_time[l]; //copty the time
@@ -238,7 +242,7 @@ int main(int argc, char *argv[])
 	//memset(&msg, 0, sizeof(msg));
 		ret = msgrcv(msgq,&msg,sizeof(msg),IPC_NOWAIT,IPC_NOWAIT); //to receive message
 		if(ret != -1){
-			printf("get message\n");
+			fprintf(fptr,"get message\n");
 			//printf("insert io _time %d to child_io_time",msg.io_time);
 			child_io_time[msg.pid_index]=msg.io_time;
 			memset(&msg, 0, sizeof(msg));

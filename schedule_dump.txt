@@ -1,0 +1,212 @@
+time 1:===============================================
+pid:16027 ,remaining cpu-burst2
+time 2:===============================================
+pid:16027 ,remaining cpu-burst1
+get message
+time 3:===============================================
+pid: 16027 in IO, remaining IO-burst: 7
+pid:16028 ,remaining cpu-burst6
+time 4:===============================================
+pid: 16027 in IO, remaining IO-burst: 6
+pid:16028 ,remaining cpu-burst5
+time 5:===============================================
+pid: 16027 in IO, remaining IO-burst: 5
+pid:16028 ,remaining cpu-burst4
+time 6:===============================================
+pid: 16027 in IO, remaining IO-burst: 4
+pid:16029 ,remaining cpu-burst5
+time 7:===============================================
+pid: 16027 in IO, remaining IO-burst: 3
+pid:16029 ,remaining cpu-burst4
+time 8:===============================================
+pid: 16027 in IO, remaining IO-burst: 2
+pid:16029 ,remaining cpu-burst3
+time 9:===============================================
+pid: 16027 in IO, remaining IO-burst: 1
+pid:16030 ,remaining cpu-burst4
+time 10:===============================================
+pid:16030 ,remaining cpu-burst3
+time 11:===============================================
+pid:16030 ,remaining cpu-burst2
+time 12:===============================================
+pid:16031 ,remaining cpu-burst1
+get message
+time 13:===============================================
+pid: 16031 in IO, remaining IO-burst: 2
+pid:16032 ,remaining cpu-burst3
+time 14:===============================================
+pid: 16031 in IO, remaining IO-burst: 1
+pid:16032 ,remaining cpu-burst2
+time 15:===============================================
+pid:16032 ,remaining cpu-burst1
+get message
+time 16:===============================================
+pid: 16032 in IO, remaining IO-burst: 2
+pid:16033 ,remaining cpu-burst2
+time 17:===============================================
+pid: 16032 in IO, remaining IO-burst: 1
+pid:16033 ,remaining cpu-burst1
+get message
+time 18:===============================================
+pid: 16033 in IO, remaining IO-burst: 2
+pid:16034 ,remaining cpu-burst3
+time 19:===============================================
+pid: 16033 in IO, remaining IO-burst: 1
+pid:16034 ,remaining cpu-burst2
+time 20:===============================================
+pid:16034 ,remaining cpu-burst1
+get message
+time 21:===============================================
+pid: 16034 in IO, remaining IO-burst: 3
+pid:16035 ,remaining cpu-burst5
+time 22:===============================================
+pid: 16034 in IO, remaining IO-burst: 2
+pid:16035 ,remaining cpu-burst4
+time 23:===============================================
+pid: 16034 in IO, remaining IO-burst: 1
+pid:16035 ,remaining cpu-burst3
+time 24:===============================================
+pid:16036 ,remaining cpu-burst6
+time 25:===============================================
+pid:16036 ,remaining cpu-burst5
+time 26:===============================================
+pid:16036 ,remaining cpu-burst4
+time 27:===============================================
+pid:16028 ,remaining cpu-burst3
+time 28:===============================================
+pid:16028 ,remaining cpu-burst2
+time 29:===============================================
+pid:16028 ,remaining cpu-burst1
+get message
+time 30:===============================================
+pid: 16028 in IO, remaining IO-burst: 4
+pid:16029 ,remaining cpu-burst2
+time 31:===============================================
+pid: 16028 in IO, remaining IO-burst: 3
+pid:16029 ,remaining cpu-burst1
+get message
+time 32:===============================================
+pid: 16028 in IO, remaining IO-burst: 2
+pid: 16029 in IO, remaining IO-burst: 9
+pid:16027 ,remaining cpu-burst2
+time 33:===============================================
+pid: 16028 in IO, remaining IO-burst: 1
+pid: 16029 in IO, remaining IO-burst: 8
+pid:16027 ,remaining cpu-burst1
+get message
+time 34:===============================================
+pid: 16027 in IO, remaining IO-burst: 6
+pid: 16029 in IO, remaining IO-burst: 7
+pid:16030 ,remaining cpu-burst1
+get message
+time 35:===============================================
+pid: 16030 in IO, remaining IO-burst: 2
+pid: 16027 in IO, remaining IO-burst: 5
+pid: 16029 in IO, remaining IO-burst: 6
+pid:16031 ,remaining cpu-burst1
+get message
+time 36:===============================================
+pid: 16030 in IO, remaining IO-burst: 1
+pid: 16027 in IO, remaining IO-burst: 4
+pid: 16029 in IO, remaining IO-burst: 5
+pid: 16031 in IO, remaining IO-burst: 5
+pid:16032 ,remaining cpu-burst3
+time 37:===============================================
+pid: 16027 in IO, remaining IO-burst: 3
+pid: 16029 in IO, remaining IO-burst: 4
+pid: 16031 in IO, remaining IO-burst: 4
+pid:16032 ,remaining cpu-burst2
+time 38:===============================================
+pid: 16027 in IO, remaining IO-burst: 2
+pid: 16029 in IO, remaining IO-burst: 3
+pid: 16031 in IO, remaining IO-burst: 3
+pid:16032 ,remaining cpu-burst1
+get message
+time 39:===============================================
+pid: 16027 in IO, remaining IO-burst: 1
+pid: 16029 in IO, remaining IO-burst: 2
+pid: 16031 in IO, remaining IO-burst: 2
+pid: 16032 in IO, remaining IO-burst: 6
+pid:16033 ,remaining cpu-burst2
+time 40:===============================================
+pid: 16029 in IO, remaining IO-burst: 1
+pid: 16031 in IO, remaining IO-burst: 1
+pid: 16032 in IO, remaining IO-burst: 5
+pid:16033 ,remaining cpu-burst1
+get message
+time 41:===============================================
+pid: 16032 in IO, remaining IO-burst: 4
+pid: 16033 in IO, remaining IO-burst: 8
+pid:16034 ,remaining cpu-burst3
+time 42:===============================================
+pid: 16032 in IO, remaining IO-burst: 3
+pid: 16033 in IO, remaining IO-burst: 7
+pid:16034 ,remaining cpu-burst2
+time 43:===============================================
+pid: 16032 in IO, remaining IO-burst: 2
+pid: 16033 in IO, remaining IO-burst: 6
+pid:16034 ,remaining cpu-burst1
+get message
+time 44:===============================================
+pid: 16032 in IO, remaining IO-burst: 1
+pid: 16034 in IO, remaining IO-burst: 4
+pid: 16033 in IO, remaining IO-burst: 5
+pid:16035 ,remaining cpu-burst2
+time 45:===============================================
+pid: 16034 in IO, remaining IO-burst: 3
+pid: 16033 in IO, remaining IO-burst: 4
+pid:16035 ,remaining cpu-burst1
+get message
+time 46:===============================================
+pid: 16034 in IO, remaining IO-burst: 2
+pid: 16033 in IO, remaining IO-burst: 3
+pid: 16035 in IO, remaining IO-burst: 6
+pid:16036 ,remaining cpu-burst3
+time 47:===============================================
+pid: 16034 in IO, remaining IO-burst: 1
+pid: 16033 in IO, remaining IO-burst: 2
+pid: 16035 in IO, remaining IO-burst: 5
+pid:16036 ,remaining cpu-burst2
+time 48:===============================================
+pid: 16033 in IO, remaining IO-burst: 1
+pid: 16035 in IO, remaining IO-burst: 4
+pid:16036 ,remaining cpu-burst1
+get message
+time 49:===============================================
+pid: 16035 in IO, remaining IO-burst: 3
+pid: 16036 in IO, remaining IO-burst: 8
+pid:16028 ,remaining cpu-burst6
+time 50:===============================================
+pid: 16035 in IO, remaining IO-burst: 2
+pid: 16036 in IO, remaining IO-burst: 7
+pid:16028 ,remaining cpu-burst5
+time 51:===============================================
+pid: 16035 in IO, remaining IO-burst: 1
+pid: 16036 in IO, remaining IO-burst: 6
+pid:16028 ,remaining cpu-burst4
+time 52:===============================================
+pid: 16036 in IO, remaining IO-burst: 5
+pid:16030 ,remaining cpu-burst4
+time 53:===============================================
+pid: 16036 in IO, remaining IO-burst: 4
+pid:16030 ,remaining cpu-burst3
+time 54:===============================================
+pid: 16036 in IO, remaining IO-burst: 3
+pid:16030 ,remaining cpu-burst2
+time 55:===============================================
+pid: 16036 in IO, remaining IO-burst: 2
+pid:16027 ,remaining cpu-burst2
+time 56:===============================================
+pid: 16036 in IO, remaining IO-burst: 1
+pid:16027 ,remaining cpu-burst1
+get message
+time 57:===============================================
+pid: 16027 in IO, remaining IO-burst: 7
+pid:16029 ,remaining cpu-burst5
+time 58:===============================================
+pid: 16027 in IO, remaining IO-burst: 6
+pid:16029 ,remaining cpu-burst4
+time 59:===============================================
+pid: 16027 in IO, remaining IO-burst: 5
+pid:16029 ,remaining cpu-burst3
+time 60:===============================================
