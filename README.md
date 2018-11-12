@@ -1,5 +1,10 @@
 # os_proj1_scheduling
 
+fifo_sched.c
+-----------
+Scheduling with FIFO algorithm
+,only deal CPU burst 
+
 scheduling.c 
 -----------
   Scheduling with Round Robin algorithm
