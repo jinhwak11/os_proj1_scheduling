@@ -35,11 +35,8 @@ pid_t pid[CHILDNUM];
 int child_execution_time[CHILDNUM] ={2,6,5,4,1,3,2,3,5,6};
 int child_execution_ctime[CHILDNUM];
 node* head ;
-//int child_io_ctime[3]={1,2,3};
 int front, rear = 0;
-//int w_front, w_rear = 0;
 int run_queue[20];
-//int wait_queue[10];
 int curr_execution_time ;
 int io_time;
 
@@ -152,7 +149,7 @@ void signal_callback_handler(int signum)  // sig parent handler
 	total_count ++;
 	count ++;
 	fprintf(fptr,"time %d:===============================================\n",total_count);
-        if(total_count >= 60 ){
+        if(total_count >= 10000 ){
 		for(int k = 0; k < CHILDNUM ; k ++)
 		{
 			kill(pid[k],SIGKILL);
@@ -178,8 +175,8 @@ void signal_callback_handler(int signum)  // sig parent handler
 		if(child_execution_time[run_queue[front%20]] == 0 ){
 			child_execution_time[run_queue[front%20]] = child_execution_ctime[run_queue[front%20]]; //child execution time recover	
 		flag= 1; 
-	}
-	front ++; 
+		}
+		front ++; 
 	}
 }
 
@@ -230,10 +227,10 @@ int main(int argc, char *argv[])
 		sigaction(SIGALRM, &new_sa, &old_sa);
 
 		struct itimerval new_itimer, old_itimer;
-		new_itimer.it_interval.tv_sec = 1;
-		new_itimer.it_interval.tv_usec = 0;
-		new_itimer.it_value.tv_sec = 1;
-		new_itimer.it_value.tv_usec = 0;
+		new_itimer.it_interval.tv_sec = 0;
+		new_itimer.it_interval.tv_usec = 10000;
+		new_itimer.it_value.tv_sec = 0;
+		new_itimer.it_value.tv_usec = 10000;
 		setitimer(ITIMER_REAL, &new_itimer, &old_itimer);
  	}
 	i++;

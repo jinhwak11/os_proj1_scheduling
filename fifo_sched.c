@@ -23,16 +23,14 @@ int run_queue[10];
 void signal_child_handler(int signum)  // sig child handler 
 {
 	
-	printf("Got child signal:%d id:%d\n",signum,getpid());
+//	printf("Got child signal:%d id:%d\n",signum,getpid());
 	printf("child execution time = %d\n", child_execution_time[i]);
-	while(child_execution_time[i]>0)
-	{
-		child_execution_time[i]-- ;
-		printf("child execution time = %d\n", child_execution_time[i]);
-	}
-	
-	printf("child end\n");
+	child_execution_time[i]-- ;
+//	printf("child execution time = %d\n", child_execution_time[i]);
+	if(child_execution_time[i]<=0){	
+//	printf("child end\n");
 	exit(1);
+	}
 }
 
 
@@ -40,23 +38,24 @@ void signal_parent_handler(int signum)  // sig parent handler
 {
 	if(front == rear)
 		exit(1);
-    printf("Got parent signal:%d\n",signum);
+	printf("Got parent signal:%d\n",signum);
 	
 	kill(pid[run_queue[front%10]],SIGINT);
 	//front++;
 
-	while(child_execution_time[run_queue[front%10]]>0)
-	{
-		count = child_execution_time[run_queue[front%10]];
-		for(int j=0; j<count; j++)
-		{
+	//while(child_execution_time[run_queue[front%10]]>0)
+	//{
+	//count = child_execution_time[run_queue[front%10]];
+	//	for(int j=0; j<count; j++)
+	//	{
 			//printf("child execution time = %d\n", child_execution_time[run_queue[front%10]]);
-			child_execution_time[run_queue[front%10]] --;
-		} 
+	child_execution_time[run_queue[front%10]] --;
+	if(child_execution_time[run_queue[front%10]] == 0){
+		front ++;
 	}
-	printf("Total execution time = %d \n", count);
-
-	front++;
+	total_count ++;
+	printf("Total execution time = %d \n", total_count);
+	
 }
 
 
