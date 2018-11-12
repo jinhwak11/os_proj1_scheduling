@@ -15,4 +15,5 @@ sched_io.c
   Scheduling based on Round Robin algorithm
   ,CPU burst + I/O burst
   ,Implement I/0 burst with sorted linked list
+  ,out put file is schedule_dump.txt
 
